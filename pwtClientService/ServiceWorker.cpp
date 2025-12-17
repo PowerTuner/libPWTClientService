@@ -108,6 +108,11 @@ namespace PWTCS {
             return false;
 
         switch (static_cast<PWTS::DCMD>(args[0].toInt())) {
+            case PWTS::DCMD::DAEMON_CMD_FAIL: {
+                if (args.size() < 1)
+                    return false;
+            }
+                break;
             case PWTS::DCMD::PRINT_ERROR:
             case PWTS::DCMD::GET_DAEMON_SETTS:
             case PWTS::DCMD::APPLY_CLIENT_SETTINGS:
@@ -153,7 +158,7 @@ namespace PWTCS {
             }
                 break;
             case PWTS::DCMD::DAEMON_CMD_FAIL:
-                stopTimerForCMD(cmd);
+                stopTimerForCMD(static_cast<PWTS::DCMD>(args[1].toInt()));
                 break;
             case PWTS::DCMD::GET_DEVICE_INFO_PACKET: {
                 stopTimerForCMD(cmd);
