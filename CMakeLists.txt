@@ -8,6 +8,8 @@ set(PROJECT_AUTHOR "kylon")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
+set(DCOMPILE_OPTS "")
+set(DLINK_OPTS "")
 
 find_package(Qt6 6.10 REQUIRED COMPONENTS Core Network)
 
@@ -48,8 +50,16 @@ endif ()
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
 add_library("PWT::ClientService" ALIAS ${PROJECT_NAME})
 
-target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-Wall -fsanitize=address,undefined -Wno-padded>)
-target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=address,undefined>)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	list(APPEND DCOMPILE_OPTS /W3 /wo4061)
+
+else (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	list(APPEND DCOMPILE_OPTS -Wall -fsanitize=address,undefined -Wno-padded)
+	list(APPEND DLINK_OPTS -fsanitize=address,undefined)
+endif ()
+
+target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:${DCOMPILE_OPTS}>)
+target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:${DLINK_OPTS}>)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Core Qt::Network PWT::Shared)
 target_compile_definitions(${PROJECT_NAME} PRIVATE PWTCSERVICE_LIBRARY)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
