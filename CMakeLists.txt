@@ -48,6 +48,8 @@ endif ()
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
 add_library("PWT::ClientService" ALIAS ${PROJECT_NAME})
 
+target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-Wall -fsanitize=address,undefined -Wno-padded>)
+target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=address,undefined>)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt::Core Qt::Network PWT::Shared)
 target_compile_definitions(${PROJECT_NAME} PRIVATE PWTCSERVICE_LIBRARY)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
